@@ -11,10 +11,14 @@ public abstract class Account {
     private String status;
 
     public Account(String accountNumber, String branch, double initialBalance) {
+        this(accountNumber, branch, initialBalance, LocalDate.now());
+    }
+
+    public Account(String accountNumber, String branch, double initialBalance, LocalDate dateOpened) {
         this.accountNumber = accountNumber;
         this.branch = branch;
         this.balance = initialBalance;
-        this.dateOpened = LocalDate.now();
+        this.dateOpened = dateOpened;
         this.status = "Active";
     }
 
