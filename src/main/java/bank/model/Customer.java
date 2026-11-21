@@ -15,7 +15,7 @@ public abstract class Customer {
     private String passwordHash;
     private List<Account> accounts = new ArrayList();
 
-    public Customer (String customerId, String address, String phone, String username, String password)
+    public Customer (String customerId, String address, String phone, String username, String password) {
         this.customerId = customerId;
         this.address = address;
         this.phone = phone;
