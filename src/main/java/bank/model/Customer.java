@@ -13,7 +13,7 @@ public abstract class Customer {
     private String phone;
     private String username;
     private String passwordHash;
-    private List<Account> accounts = new ArrayList();
+    private List<Account> accounts = new ArrayList<>();
 
     public Customer (String customerId, String address, String phone, String username, String password) {
         this.customerId = customerId;
@@ -36,7 +36,7 @@ public void addAccount(Account account) {
     accounts.add(account);
 }
 
-public List<Account> geAccounts() {
+public List<Account> getAccounts() {
     return new ArrayList<>(accounts);
 }
 
