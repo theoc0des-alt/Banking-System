@@ -1,18 +1,25 @@
 package bank.controller;
 
 import bank.dao.CustomerDAO;
+import bank.dao.StaffDAO;
 import bank.model.Customer;
+import bank.model.Role;
+import bank.model.Staff;
 
 public class LoginController {
 
     private final CustomerDAO customerDAO;
+    private final StaffDAO staffDAO;
     private Customer currentCustomer;
+    private Staff currentStaff;
+    private Role currentRole;
     private boolean loggedIn = false;
     private int failedAttempts = 0;
     private final int maxAttempts = 3;
 
-    public LoginController(CustomerDAO customerDAO) {
+    public LoginController(CustomerDAO customerDAO, StaffDAO staffDAO) {
         this.customerDAO = customerDAO;
+        this.staffDAO = staffDAO;
     }
 
     public boolean login(String username, String password) {
@@ -24,9 +31,19 @@ public class LoginController {
             return false;
         }
 
-        Customer customer = customerDAO.findByUsername(username);   // step 1 in your sequence diagram
-        if (customer != null && customer.checkPassword(password)) { // step 2: checkPassword
+        Customer customer = customerDAO.findByUsername(username);
+        if (customer != null && customer.checkPassword(password)) {
             currentCustomer = customer;
+            currentRole = Role.CUSTOMER;
+            loggedIn = true;
+            failedAttempts = 0;
+            return true;
+        }
+
+        Staff staff = staffDAO.findByUsername(username);
+        if (staff != null && staff.checkPassword(password)) {
+            currentStaff = staff;
+            currentRole = Role.STAFF;
             loggedIn = true;
             failedAttempts = 0;
             return true;
@@ -38,10 +55,14 @@ public class LoginController {
 
     public void logout() {
         currentCustomer = null;
+        currentStaff = null;
+        currentRole = null;
         loggedIn = false;
     }
 
     public boolean isLoggedIn() { return loggedIn; }
+    public Role getCurrentRole() { return currentRole; }
     public Customer getCurrentCustomer() { return currentCustomer; }
+    public Staff getCurrentStaff() { return currentStaff; }
     public int getRemainingAttempts() { return maxAttempts - failedAttempts; }
 }
