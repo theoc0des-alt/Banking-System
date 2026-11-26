@@ -4,6 +4,7 @@ import bank.model.*;
 import java.time.LocalDate;
 import bank.controller.LoginController;
 import bank.dao.*;
+import bank.controller.AccountController;
 
 public class Main {
     public static void main(String[] args) {
@@ -55,6 +56,27 @@ public class Main {
         } catch (IllegalStateException e) {
             System.out.println("Locked: " + e.getMessage());
         }
+                System.out.println("--- Deposit and withdraw ---");
+        AccountDAO accountDao = new InMemoryAccountDAO();
+        TransactionDAO transactionDao = new InMemoryTransactionDAO();
+        accountDao.save(new SavingsAccount("S100", "Gaborone", 1000, 6, LocalDate.now().minusMonths(7)), "CU9");
+        accountDao.save(new ChequeAccount("C100", "Gaborone", 200, 500), "CU9");
+        AccountController accountController = new AccountController(accountDao, transactionDao);
+
+        System.out.println("Balance after depositing 250: " + accountController.deposit("S100", 250));
+        System.out.println("Balance after withdrawing 100: " + accountController.withdraw("S100", 100));
+        try {
+            accountController.deposit("S100", -5);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Rejected: " + e.getMessage());
+        }
+        try {
+            accountController.withdraw("C100", 900);
+        } catch (Exception e) {
+            System.out.println("Rejected: " + e.getMessage());
+        }
+        System.out.println("Cheque balance after withdrawing 600 (overdraft): " + accountController.withdraw("C100", 600));
+        System.out.println("Transactions on S100: " + accountController.getHistory("S100").size());
 
     }
 }
