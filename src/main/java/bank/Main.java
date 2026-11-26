@@ -1,23 +1,25 @@
 package bank;
 
-import bank.model.*;
-import java.time.LocalDate;
+import bank.controller.AccountController;
 import bank.controller.LoginController;
 import bank.dao.*;
-import bank.controller.AccountController;
+import bank.model.*;
+import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) {
+
+        System.out.println("--- Accounts ---");
         Account[] accounts = {
-                new SavingsAccount("S001", "Gaborone", 1000, 12),
-                new SavingsAccount("S002", "Gaborone", 1000, 6, LocalDate.now().minusMonths(7)),
-                new InvestmentAccount("I001", "Gaborone", 500),
-                new ChequeAccount("C001", "Gaborone", 200, 500)
+            new SavingsAccount("S001", "Gaborone", 1000, 12),
+            new SavingsAccount("S002", "Gaborone", 1000, 6, LocalDate.now().minusMonths(7)),
+            new InvestmentAccount("I001", "Gaborone", 500),
+            new ChequeAccount("C001", "Gaborone", 200, 500)
         };
 
         for (Account a : accounts) {
             try {
-                a.withdraw(300); // same call, different behaviour (polymorphism)
+                a.withdraw(300);   // same call, different behaviour (polymorphism)
                 System.out.println(a.getAccountNumber() + " withdrew 300, balance: " + a.getBalance());
             } catch (Exception e) {
                 System.out.println(a.getAccountNumber() + " failed: " + e.getMessage());
@@ -26,6 +28,35 @@ public class Main {
                 System.out.println("  interest due: " + ib.calculateInterest());
             }
         }
+
+        System.out.println("--- Customers ---");
+        IndividualCustomer person = new IndividualCustomer("CU1", "Plot 12, Gaborone", "71234567",
+                "thato", "pass123", "Thato", "Mokoena", "123456789");
+        CompanyCustomer firm = new CompanyCustomer("CU2", "Main Mall, Gaborone", "3951234",
+                "acme", "secret", "Acme Ltd", "BW0001");
+
+        person.addAccount(new SavingsAccount("S010", "Gaborone", 1000, 6));
+        try {
+            person.addAccount(new ChequeAccount("C010", "Gaborone", 0, 500));
+        } catch (Exception e) {
+            System.out.println(person.getDisplayName() + " blocked: " + e.getMessage());
+        }
+        person.setEmployer("Acme Ltd", "Main Mall");
+        person.addAccount(new ChequeAccount("C010", "Gaborone", 0, 500));
+        System.out.println(person.getDisplayName() + " has " + person.getAccounts().size() + " accounts");
+        System.out.println("Password ok: " + person.checkPassword("pass123")
+                + ", wrong password: " + person.checkPassword("nope"));
+
+        try {
+            firm.addAccount(new ChequeAccount("C011", "Gaborone", 0, 500));
+        } catch (Exception e) {
+            System.out.println(firm.getDisplayName() + " blocked: " + e.getMessage());
+        }
+
+        Transaction t = new Transaction("T001", "DEPOSIT", 250.00, "S010");
+        System.out.println("Transaction " + t.getTransactionId() + ": " + t.getType()
+                + " " + t.getAmount() + " on " + t.getAccountNumber());
+
         System.out.println("--- Login ---");
         CustomerDAO dao = new InMemoryCustomerDAO();
         dao.save(new IndividualCustomer("CU9", "Plot 5, Gaborone", "71111111",
@@ -56,7 +87,8 @@ public class Main {
         } catch (IllegalStateException e) {
             System.out.println("Locked: " + e.getMessage());
         }
-                System.out.println("--- Deposit and withdraw ---");
+
+        System.out.println("--- Deposit and withdraw ---");
         AccountDAO accountDao = new InMemoryAccountDAO();
         TransactionDAO transactionDao = new InMemoryTransactionDAO();
         accountDao.save(new SavingsAccount("S100", "Gaborone", 1000, 6, LocalDate.now().minusMonths(7)), "CU9");
@@ -78,5 +110,12 @@ public class Main {
         System.out.println("Cheque balance after withdrawing 600 (overdraft): " + accountController.withdraw("C100", 600));
         System.out.println("Transactions on S100: " + accountController.getHistory("S100").size());
 
+        System.out.println("--- Database ---");
+        Database.createTables();
+        try (java.sql.Connection c = Database.getConnection()) {
+            System.out.println("Connected to: " + c.getMetaData().getURL());
+        } catch (Exception e) {
+            System.out.println("Database failed: " + e.getMessage());
+        }
     }
 }
