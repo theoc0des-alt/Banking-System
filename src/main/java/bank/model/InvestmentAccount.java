@@ -1,5 +1,7 @@
 package bank.model;
 
+import java.time.LocalDate;
+
 public class InvestmentAccount extends Account implements InterestBearing {
 
     private double interestRate = 0.05;     // 5% per month
@@ -10,6 +12,11 @@ public class InvestmentAccount extends Account implements InterestBearing {
         if (initialDeposit < minDeposit) {
             throw new IllegalArgumentException("Investment accounts need at least BWP500.00 to open");
         }
+    }
+
+    // Used when loading an existing account from the database (the BWP500 rule only applies when opening)
+    public InvestmentAccount(String accountNumber, String branch, double balance, LocalDate dateOpened) {
+        super(accountNumber, branch, balance, dateOpened);
     }
 
     @Override
