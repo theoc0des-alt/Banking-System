@@ -22,6 +22,11 @@ public class Staff {
         this.passwordHash = PasswordUtil.hash(password);
     }
 
+    public String getPasswordHash() { return passwordHash; }
+
+    // Used when loading a saved staff member from the database
+    public void restorePasswordHash(String hash) { this.passwordHash = hash; }
+
     public String getDisplayName() { return name; }
     public String getStaffId() { return staffId; }
     public String getUsername() { return username; }

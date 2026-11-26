@@ -47,6 +47,11 @@ public abstract class Customer {
         this.passwordHash = PasswordUtil.hash(password);
     }
 
+    public String getPasswordHash() { return passwordHash; }
+
+    // Used when loading a saved customer from the database
+    public void restorePasswordHash(String hash) { this.passwordHash = hash; }
+
     public String getCustomerId() { return customerId; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
