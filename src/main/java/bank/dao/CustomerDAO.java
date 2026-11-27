@@ -1,8 +1,13 @@
 package bank.dao;
 
 import bank.model.Customer;
+import java.util.List;
 
 public interface CustomerDAO {
-    Customer findByUsername(String username);   // returns null if not found
-    void save(Customer customer);
+    void save(Customer customer);                    
+    Customer findByUsername(String username);        
+    Customer findById(String customerId);           
+    List<Customer> findAll();                        
+    void update(Customer customer);                 
+    void delete(String customerId);                  
 }

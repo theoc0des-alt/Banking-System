@@ -1,8 +1,12 @@
 package bank.dao;
 
 import bank.model.Staff;
+import java.util.List;
 
 public interface StaffDAO {
-    Staff findByUsername(String username);   // returns null if not found
-    void save(Staff staff);
+    void save(Staff staff);                           
+    Staff findByUsername(String username);           
+    List<Staff> findAll();                           
+    void update(Staff staff);                        
+    void delete(String staffId);                     
 }
